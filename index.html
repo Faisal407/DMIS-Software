@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,6 +104,14 @@
   .code-box .code{font-family:'IBM Plex Mono',monospace; color:var(--ink);}
 
   .modal-backdrop{position:fixed; inset:0; background:rgba(10,15,20,.86); z-index:100; display:none; align-items:center; justify-content:center; padding:16px;}
+  .home-title{text-align:center; padding:44px 20px 22px;}
+  .home-title h1{font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:700; color:var(--ink); letter-spacing:.3px; margin:0 0 6px;}
+  .activity-list{display:flex; flex-direction:column; gap:16px; padding:0 18px 40px; max-width:480px; margin:0 auto;}
+  .activity-card{display:block; width:100%; text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:22px 20px; cursor:pointer; box-shadow:0 2px 10px rgba(20,30,40,.06);}
+  .activity-card:active{background:var(--paper);}
+  .activity-icon{font-size:34px; margin-bottom:8px;}
+  .activity-title{font-family:'Barlow Condensed',sans-serif; font-size:21px; font-weight:700; color:var(--ink);}
+  .activity-sub{font-size:13px; color:var(--muted); margin-top:4px;}
   .modal-backdrop.open{display:flex;}
   .modal-box{background:#fff; border-radius:14px; padding:16px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto;}
   .modal-box h3{color:var(--steel); font-size:19px; margin-bottom:8px;}
@@ -157,17 +166,39 @@
 </head>
 <body>
 
+<!-- ============ HOMEPAGE ============ -->
+<div id="homeScreen">
+  <div class="home-title">
+    <h1>DOMESTIC METER INSPECTION SHOP</h1>
+    <div class="subtext">SNGPL Faisalabad-D — select an activity</div>
+  </div>
+  <div class="activity-list">
+    <button class="activity-card" onclick="openActivity('receiving')">
+      <div class="activity-icon">📋</div>
+      <div class="activity-title">DMIS Receiving Inspection</div>
+      <div class="activity-sub">Scan, classify, read, inspect, and document received meters</div>
+    </button>
+    <button class="activity-card" onclick="openActivity('listprep')">
+      <div class="activity-icon">📦</div>
+      <div class="activity-title">Dispatch List / Scrap List</div>
+      <div class="activity-sub">Prepare Dispatch, Scrap, and Irrepairable lists</div>
+    </button>
+  </div>
+</div>
+
+<!-- ============ RECEIVING INSPECTION SHELL ============ -->
+<div id="receivingShell" style="display:none;">
 <header class="topbar">
   <div class="row1">
     <div>
       <h1>DMIS Receiving Inspection</h1>
       <div class="tag" id="projTag">No project open · SNGPL Faisalabad-D</div>
     </div>
+    <button class="btn outline small" style="flex:0 0 auto; margin-top:0;" onclick="goHome()">🏠 Home</button>
   </div>
   <div class="main-tabs">
     <button class="main-tab" id="tabBtnInspect" onclick="showTab('inspect')">📋 Inspection</button>
     <button class="main-tab active" id="tabBtnProjects" onclick="showTab('projects')">🗂 Projects</button>
-    <button class="main-tab" id="tabBtnListPrep" onclick="showTab('listprep')">📦 Dispatch/Scrap Lists</button>
     <button class="main-tab" id="tabBtnStats" onclick="showTab('stats')">📊 Stats</button>
     <button class="main-tab" id="tabBtnSettings" onclick="showTab('settings')">⚙ Settings</button>
   </div>
@@ -407,133 +438,6 @@
   </div>
 </div>
 
-<!-- ============ LIST PREP TAB (Dispatch / Scrap / Irrepairable) ============ -->
-<div id="tabListPrep" style="display:none;">
-
-  <div id="lpProjectListView">
-    <div class="banner">
-      <b>Dispatch / Scrap / Irrepairable List Preparation.</b> Prepare a fresh list, or verify against
-      an already-declared list (upload it as the reference — matches by Meter No., with Make/Category
-      shown for cross-check if included). Export splits automatically into Dispatch, Scrap,
-      Irrepairable, and Missing-from-Reference sheets, ready to feed into the official approval format
-      later.
-    </div>
-    <button class="btn amber" onclick="openNewListPrepModal()">➕ New List</button>
-    <div id="lpProjectList" style="margin-top:14px;">
-      <div class="subtext">No lists yet — create one above to get started.</div>
-    </div>
-  </div>
-
-  <div id="lpEntryView" style="display:none;">
-    <div class="card">
-      <h2 id="lpProjName">List</h2>
-      <button class="btn outline small" onclick="closeListPrepEntryView()">← Back to Lists</button>
-    </div>
-
-    <div class="card">
-      <h2>Reference List (optional)</h2>
-      <div class="subtext" id="lpRefStatus">No reference list loaded — this is a fresh list.</div>
-      <input type="file" id="lpRefFileInput" accept=".csv,.xlsx,.xls">
-    </div>
-
-    <div class="card">
-      <h2>Meter Identity</h2>
-      <button class="btn amber" onclick="openListPrepScanner()">📷 Scan Barcode</button>
-      <label class="field-label">Meter No.</label>
-      <input type="text" id="lpMeterNo" placeholder="e.g. A7885606" oninput="onLpMeterNoInput()">
-      <div id="lpMatchBadge"></div>
-    </div>
-
-    <div class="card">
-      <h2>Classification</h2>
-      <label class="field-label">Category</label>
-      <div class="chip-grid" id="lpCategoryChips"></div>
-      <div id="lpAliasWrap" style="display:none;">
-        <label class="field-label">Make / Model (Alias)</label>
-        <div class="chip-grid" id="lpAliasChips"></div>
-      </div>
-      <div id="lpVariantWrap" style="display:none;">
-        <label class="field-label">Variant</label>
-        <div class="chip-grid" id="lpVariantChips"></div>
-      </div>
-      <label class="field-label">Year of Manufacturing</label>
-      <input type="text" id="lpYearMfg" placeholder="e.g. 2014" inputmode="numeric">
-    </div>
-
-    <div class="card">
-      <h2>Declared Status</h2>
-      <div class="doc-select-group" id="lpStatus" data-ok="dispatch">
-        <button data-val="dispatch" data-default="true">Dispatch (Repairable)</button>
-        <button data-val="scrap">Scrap</button>
-        <button data-val="irrepairable">Irrepairable</button>
-      </div>
-      <label class="field-label">Lot No.</label>
-      <input type="text" id="lpLotNo" placeholder="Lot No. (optional)">
-      <label class="field-label">Remarks</label>
-      <textarea id="lpRemarks" rows="2" placeholder="Reason / notes…"></textarea>
-      <button class="btn outline" onclick="openListPrepCamera()">📷 Add Photo (optional, multiple allowed)</button>
-      <div class="thumb-row" id="lpPhotoThumb"></div>
-    </div>
-
-    <div class="row" style="margin-bottom:20px;">
-      <button class="btn outline" onclick="resetListPrepForm(true)" style="flex:0 0 110px;">Clear</button>
-      <button class="btn amber" onclick="saveListPrepEntry()">💾 Save Entry</button>
-    </div>
-
-    <div class="card">
-      <h2>Entries</h2>
-      <div class="chip-grid" id="lpFilterChips"></div>
-      <div class="table-wrap">
-        <table class="records" id="lpRecordsTable">
-          <thead><tr><th>Sr#</th><th>Meter No.</th><th>Type</th><th>Year</th><th>Status</th><th>Lot</th><th>Ref Match</th><th></th></tr></thead>
-          <tbody id="lpRecordsBody"></tbody>
-        </table>
-      </div>
-      <button class="btn outline" style="margin-top:10px;" onclick="exportListPrepExcel()">⬇ Export (Dispatch/Scrap/Irrepairable/Missing)</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- New List Prep project modal -->
-<div class="modal-backdrop" id="newListPrepModal">
-  <div class="modal-box">
-    <h3>New Dispatch/Scrap List</h3>
-    <label class="field-label">List Name</label>
-    <input type="text" id="lpNpName" placeholder="e.g. Repairable Backlog Review — July">
-    <label class="field-label">Device Name</label>
-    <input type="text" id="lpNpDevice" placeholder="e.g. Inspector-1 Phone">
-    <label class="field-label">Google Sheet ID for this list (optional — link later if unsure)</label>
-    <input type="text" id="lpNpSheetId" placeholder="A Sheet ID — can be its own, or shared with a project">
-    <label class="field-label">Apps Script Web App URL (optional — same URL reused everywhere)</label>
-    <input type="text" id="lpNpScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
-    <div class="subtext" style="margin-top:8px;">Uses the same Entries Apps Script as Receiving Inspection — nothing extra to deploy.</div>
-    <button class="btn amber" onclick="createListPrepProject()">Create List</button>
-    <button class="btn outline" onclick="closeNewListPrepModal()">Cancel</button>
-  </div>
-</div>
-
-<!-- List Prep scanner modal -->
-<div class="modal-backdrop" id="lpScannerModal">
-  <div class="modal-box">
-    <h3>Scan Meter Barcode</h3>
-    <div class="subtext">Fill the box with just the barcode, hold steady, good light helps a lot.</div>
-    <div id="lp-qr-reader"></div>
-    <button class="btn outline" onclick="closeListPrepScanner()">Cancel</button>
-  </div>
-</div>
-
-<!-- List Prep camera modal -->
-<div class="modal-backdrop" id="lpCameraModal">
-  <div class="modal-box">
-    <h3>Capture Photo</h3>
-    <video id="lpCamVideo" class="cam-preview" autoplay playsinline></video>
-    <canvas id="lpCamCanvas"></canvas>
-    <button class="btn amber" onclick="captureListPrepPhoto()">📸 Capture</button>
-    <button class="btn outline" onclick="closeListPrepCamera()">Cancel</button>
-  </div>
-</div>
-
 <!-- ============ STATS TAB ============ -->
 <div id="tabStats" style="display:none;">
   <div class="card">
@@ -590,7 +494,7 @@ function doPost(e) {
   if (data.action === 'grantAccess') {
     return output(grantAccess(data.sheetId, data.projectSheetId, data.projectName, data.deviceName, data.durationHours));
   }
-  return output(registerProject(data.sheetId, data.name, data.projectSheetId, data.createdAt, data.mrvNo));
+  return output(registerProject(data.sheetId, data.name, data.projectSheetId, data.createdAt, data.mrvNo, data.activity));
 }
 
 function doGet(e) {
@@ -598,7 +502,7 @@ function doGet(e) {
   var callback = e.parameter.callback;
   var result;
   if (action === 'registerProject') {
-    result = registerProject(e.parameter.sheetId, e.parameter.name, e.parameter.projectSheetId, null, e.parameter.mrvNo);
+    result = registerProject(e.parameter.sheetId, e.parameter.name, e.parameter.projectSheetId, null, e.parameter.mrvNo, e.parameter.activity);
   } else if (action === 'checkAccess') {
     result = checkAccess(e.parameter.sheetId, e.parameter.projectSheetId, e.parameter.projectName, e.parameter.deviceName);
   } else {
@@ -617,14 +521,15 @@ function listProjects(registrySheetId) {
     for (var pi = 1; pi < pvals.length; pi++) {
       if (pvals[pi][1]) plist.push({
         name: pvals[pi][0], sheetId: pvals[pi][1], createdAt: pvals[pi][2], mrvNo: pvals[pi][3] || '',
-        restricted: pvals[pi][4] === true || pvals[pi][4] === 'TRUE'
+        restricted: pvals[pi][4] === true || pvals[pi][4] === 'TRUE',
+        activity: pvals[pi][5] || 'receiving'   // blank = pre-existing row from before this column existed
       });
     }
   }
   return plist;
 }
 
-function registerProject(registrySheetId, name, projectSheetId, createdAt, mrvNo) {
+function registerProject(registrySheetId, name, projectSheetId, createdAt, mrvNo, activity) {
   if (!registrySheetId || !projectSheetId) {
     return { status: 'error', message: 'Missing sheetId or projectSheetId. Received sheetId=[' + registrySheetId + '] projectSheetId=[' + projectSheetId + ']' };
   }
@@ -644,7 +549,7 @@ function registerProject(registrySheetId, name, projectSheetId, createdAt, mrvNo
     var psheet = ss.getSheetByName('Projects');
     if (!psheet) {
       psheet = ss.insertSheet('Projects');
-      psheet.appendRow(['Name', 'Sheet ID', 'Created At', 'MRV No', 'Restricted']);
+      psheet.appendRow(['Name', 'Sheet ID', 'Created At', 'MRV No', 'Restricted', 'Activity']);
     }
     var pvals = psheet.getDataRange().getValues();
     var existingRow = -1;
@@ -652,7 +557,7 @@ function registerProject(registrySheetId, name, projectSheetId, createdAt, mrvNo
       if (pvals[pi][1] === projectSheetId) { existingRow = pi; break; }
     }
     if (existingRow === -1) {
-      psheet.appendRow([name || '', projectSheetId, createdAt || new Date().toISOString(), mrvNo || '', false]);
+      psheet.appendRow([name || '', projectSheetId, createdAt || new Date().toISOString(), mrvNo || '', false, activity || 'receiving']);
       SpreadsheetApp.flush();
     }
     return { status: 'ok', alreadyExisted: existingRow !== -1, projectSheetId: projectSheetId };
@@ -1177,6 +1082,216 @@ function doGet(e) {
   </div>
 </div>
 
+</div> <!-- /#receivingShell -->
+
+<!-- ============ DISPATCH LIST / SCRAP LIST SHELL ============ -->
+<div id="listPrepShell" style="display:none;">
+<header class="topbar">
+  <div class="row1">
+    <div>
+      <h1>Dispatch List / Scrap List</h1>
+      <div class="tag" id="lpProjTag">No list open · SNGPL Faisalabad-D</div>
+    </div>
+    <button class="btn outline small" style="flex:0 0 auto; margin-top:0;" onclick="goHome()">🏠 Home</button>
+  </div>
+  <div class="main-tabs">
+    <button class="main-tab active" id="lpTabBtnProjects" onclick="showLpTab('projects')">🗂 Projects</button>
+    <button class="main-tab" id="lpTabBtnEntry" onclick="showLpTab('entry')">📦 Entry</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ---- List Prep: Projects tab ---- -->
+<div id="lpTabProjects">
+  <div class="banner">
+    <b>Dispatch / Scrap / Irrepairable List Preparation.</b> Its own separate lists, sharing, and
+    Auto-Restore — independent from DMIS Receiving Inspection. Prepare a fresh list, or verify against
+    an already-declared list (upload it as the reference — matches by Meter No., with Make/Category
+    shown for cross-check if included).
+  </div>
+  <div class="row">
+    <button class="btn amber" onclick="openNewListPrepModal()">➕ New List</button>
+    <button class="btn outline" onclick="openLpJoinModal()">🔗 Join via Code</button>
+  </div>
+  <div class="subtext" style="margin-top:6px;">
+    Registry / Apps Script setup is shared with Receiving Inspection —
+    <a href="#" onclick="goHome(); openActivity('receiving'); showTab('settings'); return false;">open it from there</a>.
+  </div>
+  <div id="lpProjectList" style="margin-top:14px;">
+    <div class="subtext">No lists yet — create one above to get started.</div>
+  </div>
+</div>
+
+<!-- ---- List Prep: Entry tab ---- -->
+<div id="lpTabEntry" style="display:none;">
+  <div id="lpNoProjectBlock" class="banner block">
+    <b>No list open.</b><br>Go to the <b>Projects</b> tab to create or open one first.
+    <br><button class="btn amber" style="margin-top:10px;" onclick="showLpTab('projects')">Go to Projects</button>
+  </div>
+  <div id="lpEntryContent" style="display:none;">
+    <div id="lpPausedBanner" class="banner" style="display:none; background:#fbe6d6; border-color:var(--amber);">
+      ⏸ <b>This list is paused for this device.</b> You can view its records and history, but Save Entry is
+      disabled until the list owner sets it back to Allowed.
+    </div>
+    <div class="card">
+      <h2 id="lpProjName">List</h2>
+    </div>
+
+    <div class="card">
+      <h2>Reference List (optional)</h2>
+      <div class="subtext" id="lpRefStatus">No reference list loaded — this is a fresh list.</div>
+      <input type="file" id="lpRefFileInput" accept=".csv,.xlsx,.xls">
+    </div>
+
+    <div class="card">
+      <h2>Meter Identity</h2>
+      <button class="btn amber" onclick="openListPrepScanner()">📷 Scan Barcode</button>
+      <label class="field-label">Meter No.</label>
+      <input type="text" id="lpMeterNo" placeholder="e.g. A7885606" oninput="onLpMeterNoInput()">
+      <div id="lpMatchBadge"></div>
+    </div>
+
+    <div class="card">
+      <h2>Classification</h2>
+      <label class="field-label">Category</label>
+      <div class="chip-grid" id="lpCategoryChips"></div>
+      <div id="lpAliasWrap" style="display:none;">
+        <label class="field-label">Make / Model (Alias)</label>
+        <div class="chip-grid" id="lpAliasChips"></div>
+      </div>
+      <div id="lpVariantWrap" style="display:none;">
+        <label class="field-label">Variant</label>
+        <div class="chip-grid" id="lpVariantChips"></div>
+      </div>
+      <label class="field-label">Year of Manufacturing</label>
+      <input type="text" id="lpYearMfg" placeholder="e.g. 2014" inputmode="numeric">
+    </div>
+
+    <div class="card">
+      <h2>Declared Status</h2>
+      <div class="doc-select-group" id="lpStatus" data-ok="dispatch">
+        <button data-val="dispatch" data-default="true">Dispatch (Repairable)</button>
+        <button data-val="scrap">Scrap</button>
+        <button data-val="irrepairable">Irrepairable</button>
+      </div>
+      <label class="field-label">Lot No.</label>
+      <input type="text" id="lpLotNo" placeholder="Lot No. (optional)">
+      <label class="field-label">Remarks</label>
+      <textarea id="lpRemarks" rows="2" placeholder="Reason / notes…"></textarea>
+      <button class="btn outline" onclick="openListPrepCamera()">📷 Add Photo (optional, multiple allowed)</button>
+      <div class="thumb-row" id="lpPhotoThumb"></div>
+    </div>
+
+    <div class="row" style="margin-bottom:20px;">
+      <button class="btn outline" onclick="resetListPrepForm(true)" style="flex:0 0 110px;">Clear</button>
+      <button class="btn amber" id="lpSaveEntryBtn" onclick="saveListPrepEntry()">💾 Save Entry</button>
+    </div>
+
+    <div class="card">
+      <h2>Entries</h2>
+      <div class="chip-grid" id="lpFilterChips"></div>
+      <div class="table-wrap">
+        <table class="records" id="lpRecordsTable">
+          <thead><tr><th>Sr#</th><th>Meter No.</th><th>Type</th><th>Year</th><th>Status</th><th>Lot</th><th>Ref Match</th><th></th></tr></thead>
+          <tbody id="lpRecordsBody"></tbody>
+        </table>
+      </div>
+      <button class="btn outline" style="margin-top:10px;" onclick="exportListPrepExcel()">⬇ Export (Dispatch/Scrap/Irrepairable/Missing)</button>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- New List Prep project modal -->
+<div class="modal-backdrop" id="newListPrepModal">
+  <div class="modal-box">
+    <h3>New Dispatch/Scrap List</h3>
+    <label class="field-label">List Name</label>
+    <input type="text" id="lpNpName" placeholder="e.g. Repairable Backlog Review — July">
+    <label class="field-label">Device Name</label>
+    <input type="text" id="lpNpDevice" placeholder="e.g. Inspector-1 Phone">
+    <label class="field-label">Google Sheet ID for this list (optional — link later if unsure)</label>
+    <input type="text" id="lpNpSheetId" placeholder="A Sheet ID — can be its own, or shared with a project">
+    <label class="field-label">Apps Script Web App URL (optional — same URL reused everywhere)</label>
+    <input type="text" id="lpNpScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="cond-row" style="margin-top:10px;">
+      <span class="cond-label">🔒 Restricted Access</span>
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px;">
+        <input type="checkbox" id="lpNpRestricted" style="width:auto;"> Only granted devices can join
+      </label>
+    </div>
+    <div class="subtext" style="margin-top:8px;">Uses the same Entries Apps Script as Receiving Inspection — nothing extra to deploy.</div>
+    <button class="btn amber" onclick="createListPrepProject()">Create List</button>
+    <button class="btn outline" onclick="closeNewListPrepModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- List Prep: Join via Code modal -->
+<div class="modal-backdrop" id="lpJoinModal">
+  <div class="modal-box">
+    <h3>Join List via Code</h3>
+    <div class="subtext">Scan the QR code from the other device's list card, or paste the Share Code text instead.</div>
+    <label class="field-label">Your Device Name</label>
+    <input type="text" id="lpJoinDeviceName" placeholder="e.g. Inspector-2 Phone">
+    <button class="btn amber" onclick="openLpJoinQrScanner()">📷 Scan QR Code</button>
+    <label class="field-label" style="margin-top:14px;">— or paste the Share Code text —</label>
+    <textarea id="lpJoinCodeInput" rows="3" placeholder="Paste the code here…"></textarea>
+    <button class="btn outline" onclick="lpJoinFromCode()">Join &amp; Pull Records</button>
+    <button class="btn outline" onclick="closeLpJoinModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- List Prep: Share modal (QR + text) -->
+<div class="modal-backdrop" id="lpShareModal">
+  <div class="modal-box">
+    <h3 id="lpShareModalTitle">Share List</h3>
+    <div class="subtext" id="lpShareModalSubtext"></div>
+    <div style="display:flex; justify-content:center; margin:14px 0;">
+      <canvas id="lpShareQrCanvas" style="max-width:100%; border-radius:10px;"></canvas>
+    </div>
+    <div class="ocr-status" id="lpShareQrStatus"></div>
+    <label class="field-label">Share Code (text fallback)</label>
+    <div class="code-box"><span class="code" id="lpShareCodeText" style="font-size:11px; word-break:break-all;"></span></div>
+    <button class="btn amber" style="margin-top:8px;" onclick="copyLpShareCodeText()">📋 Copy Code Text</button>
+    <button class="btn outline" onclick="closeLpShareModal()">Close</button>
+  </div>
+</div>
+
+<!-- List Prep: QR scanner for joining -->
+<div class="modal-backdrop" id="lpJoinQrScannerModal">
+  <div class="modal-box">
+    <h3>Scan List QR Code</h3>
+    <div class="subtext">Point the camera at the QR code shown on the other device's "Share List" screen.</div>
+    <div id="lp-join-qr-reader"></div>
+    <button class="btn outline" onclick="closeLpJoinQrScanner()">Cancel</button>
+  </div>
+</div>
+
+<!-- List Prep scanner modal -->
+<div class="modal-backdrop" id="lpScannerModal">
+  <div class="modal-box">
+    <h3>Scan Meter Barcode</h3>
+    <div class="subtext">Fill the box with just the barcode, hold steady, good light helps a lot.</div>
+    <div id="lp-qr-reader"></div>
+    <button class="btn outline" onclick="closeListPrepScanner()">Cancel</button>
+  </div>
+</div>
+
+<!-- List Prep camera modal -->
+<div class="modal-backdrop" id="lpCameraModal">
+  <div class="modal-box">
+    <h3>Capture Photo</h3>
+    <video id="lpCamVideo" class="cam-preview" autoplay playsinline></video>
+    <canvas id="lpCamCanvas"></canvas>
+    <button class="btn amber" onclick="captureListPrepPhoto()">📸 Capture</button>
+    <button class="btn outline" onclick="closeListPrepCamera()">Cancel</button>
+  </div>
+</div>
+
+</div> <!-- /#listPrepShell -->
+
 <script>
 const METER_TYPES = [
   {category:'G1.6', alias:'RE', variant:'Old', name:'Remus G1.6 old', indexSeals:'02 PC Seals', bodySeals:'01 Upper body,01 Front body,01 Back body'},
@@ -1235,19 +1350,44 @@ let sealSummary = { index:{status:'intact', total:0, found:''}, body:{status:'in
 function showTab(name){
   document.getElementById('tabInspect').style.display = name==='inspect' ? 'block' : 'none';
   document.getElementById('tabProjects').style.display = name==='projects' ? 'block' : 'none';
-  document.getElementById('tabListPrep').style.display = name==='listprep' ? 'block' : 'none';
   document.getElementById('tabStats').style.display = name==='stats' ? 'block' : 'none';
   document.getElementById('tabSettings').style.display = name==='settings' ? 'block' : 'none';
   document.getElementById('tabBtnInspect').classList.toggle('active', name==='inspect');
   document.getElementById('tabBtnProjects').classList.toggle('active', name==='projects');
-  document.getElementById('tabBtnListPrep').classList.toggle('active', name==='listprep');
   document.getElementById('tabBtnStats').classList.toggle('active', name==='stats');
   document.getElementById('tabBtnSettings').classList.toggle('active', name==='settings');
   if(name==='inspect') refreshInspectVisibility();
   if(name==='stats') renderStatsProjectChips();
   if(name==='projects') updateRegistryReminder();
-  if(name==='listprep') refreshListPrepVisibility();
   window.scrollTo({top:0, behavior:'smooth'});
+}
+function openActivity(name){
+  document.getElementById('homeScreen').style.display = 'none';
+  document.getElementById('receivingShell').style.display = name==='receiving' ? 'block' : 'none';
+  document.getElementById('listPrepShell').style.display = name==='listprep' ? 'block' : 'none';
+  if(name==='receiving') showTab('projects');
+  if(name==='listprep') showLpTab('projects');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goHome(){
+  document.getElementById('homeScreen').style.display = 'block';
+  document.getElementById('receivingShell').style.display = 'none';
+  document.getElementById('listPrepShell').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showLpTab(name){
+  document.getElementById('lpTabProjects').style.display = name==='projects' ? 'block' : 'none';
+  document.getElementById('lpTabEntry').style.display = name==='entry' ? 'block' : 'none';
+  document.getElementById('lpTabBtnProjects').classList.toggle('active', name==='projects');
+  document.getElementById('lpTabBtnEntry').classList.toggle('active', name==='entry');
+  if(name==='projects') renderListPrepProjectList();
+  if(name==='entry') refreshLpEntryVisibility();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function refreshLpEntryVisibility(){
+  const has = !!getActiveListPrepProject();
+  document.getElementById('lpNoProjectBlock').style.display = has ? 'none' : 'block';
+  document.getElementById('lpEntryContent').style.display = has ? 'block' : 'none';
 }
 function updateRegistryReminder(){
   const el = document.getElementById('registryReminderBanner');
@@ -1636,7 +1776,7 @@ function registerProjectInRegistry(p){
   fetch(registryScriptUrl, {
     method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({ action:'registerProject', sheetId:registrySheetId, name:p.name, projectSheetId:p.sheetId,
-      createdAt:p.createdAt, mrvNo:p.mrvNo||'' })
+      createdAt:p.createdAt, mrvNo:p.mrvNo||'', activity:'receiving' })
   }).catch(()=>{});
 }
 function manualRegisterProject(id){
@@ -1654,7 +1794,7 @@ function manualRegisterProject(id){
   fetch(registryScriptUrl, {
     method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
     body: JSON.stringify({ action:'registerProject', sheetId:registrySheetId, name:p.name, projectSheetId:p.sheetId,
-      createdAt:p.createdAt, mrvNo:p.mrvNo||'' })
+      createdAt:p.createdAt, mrvNo:p.mrvNo||'', activity:'receiving' })
   }).then(()=>{
     if(statusEl) statusEl.textContent = 'Sent — verifying…';
     verifyRegistration(p, statusEl, 1);
@@ -1766,9 +1906,25 @@ function restoreProjectsFromRegistry(regScriptUrl, regSheetId, entriesUrl, attem
   jsonpRequest(regScriptUrl, {action:'listProjects', sheetId:registrySheetId}).then(data=>{
     const list = (data && data.projects) || [];
     if(list.length === 0){ showRestoreStatus('No projects found yet in this registry.'); return; }
-    let restored = 0, skippedRestricted = 0;
+    let restored = 0, skippedRestricted = 0, lpRestored = 0, lpSkippedRestricted = 0;
     list.forEach(item=>{
       if(!item.sheetId) return;
+      if((item.activity||'receiving') === 'listprep'){
+        const already = listPrepProjects.find(p=>p.sheetId===item.sheetId);
+        if(already) return;
+        if(item.restricted){ lpSkippedRestricted++; return; } // must Join via Code, which checks access properly
+        const lpProj = {
+          id: 'lp_' + Date.now() + Math.floor(Math.random()*100000),
+          name: item.name || 'Restored List', device: 'This device', role: 'admin',
+          restrictedAccess: false, accessPaused: false,
+          sheetId: item.sheetId, appsScriptUrl: entriesDefaultScriptUrl || '',
+          records: [], referenceMap: new Map(), srCounter: 1,
+          createdAt: item.createdAt || new Date().toLocaleString(),
+        };
+        listPrepProjects.push(lpProj);
+        lpRestored++;
+        return;
+      }
       const already = projects.find(p=>p.sheetId===item.sheetId);
       if(already) return;
       if(item.restricted){ skippedRestricted++; return; } // must Join via Code, which checks access properly
@@ -1786,12 +1942,16 @@ function restoreProjectsFromRegistry(regScriptUrl, regSheetId, entriesUrl, attem
       if(proj.appsScriptUrl){ pullRecordsFromSheet(proj.id); pullDispatcherFromSheet(proj.id); }
     });
     renderProjectList();
+    if(lpRestored>0) renderListPrepProjectList();
     updateRegistryReminder();
     revalidateRestrictedProjects();
+    lpRevalidateRestrictedProjects();
     const restrictedNote = skippedRestricted>0 ? ` ${skippedRestricted} restricted project(s) need "Join via Code" on this device.` : '';
+    const lpNote = (lpRestored>0 ? ` Plus ${lpRestored} Dispatch/Scrap list(s) restored.` : '')
+      + (lpSkippedRestricted>0 ? ` ${lpSkippedRestricted} restricted list(s) need "Join via Code" in Dispatch/Scrap Lists.` : '');
     showRestoreStatus(restored>0
-      ? `✓ Restored ${restored} project(s) automatically. ${entriesDefaultScriptUrl ? 'Records are loading in the background.' : '⚠ No entries script URL was saved with your link — open each project\'s card and paste its Apps Script URL to resume syncing.'} Check each project's Device name on its card too.${restrictedNote}`
-      : `Projects already loaded — nothing new to restore.${restrictedNote}`);
+      ? `✓ Restored ${restored} project(s) automatically. ${entriesDefaultScriptUrl ? 'Records are loading in the background.' : '⚠ No entries script URL was saved with your link — open each project\'s card and paste its Apps Script URL to resume syncing.'} Check each project's Device name on its card too.${restrictedNote}${lpNote}`
+      : `Projects already loaded — nothing new to restore.${restrictedNote}${lpNote}`);
   }).catch(err=>{
     if(attempt < 5){
       showRestoreStatus(`Connection hiccup — retrying automatically… (${attempt}/5)`);
@@ -2925,7 +3085,6 @@ function resetForm(keepProjectsUntouched){
    kept as separate DOM/state so nothing here can affect that flow.
    ============================================================ */
 function getActiveListPrepProject(){ return listPrepProjects.find(p=>p.id===activeListPrepProjectId) || null; }
-function refreshListPrepVisibility(){ /* project-list view is the default; nothing else to sync on tab entry */ }
 
 function renderLpCategoryChips(){
   const cats = [...new Set(METER_TYPES.map(m=>m.category))];
@@ -2965,21 +3124,28 @@ function openNewListPrepModal(){
 function closeNewListPrepModal(){
   document.getElementById('newListPrepModal').classList.remove('open');
   ['lpNpName','lpNpDevice','lpNpSheetId','lpNpScriptUrl'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('lpNpRestricted').checked = false;
 }
 function createListPrepProject(){
   const name = document.getElementById('lpNpName').value.trim();
   const device = document.getElementById('lpNpDevice').value.trim();
   const sheetId = document.getElementById('lpNpSheetId').value.trim();
   const appsScriptUrl = document.getElementById('lpNpScriptUrl').value.trim();
+  const restricted = document.getElementById('lpNpRestricted').checked;
   if(!name || !device){ alert('Please enter both List Name and Device Name.'); return; }
+  if(restricted && !(registryScriptUrl && registrySheetId)){
+    alert('Restricted Access needs the Auto-Restore registry set up first (Receiving Inspection → Settings) — creating this list without it.');
+  }
   const proj = {
     id: 'lp_' + Date.now() + Math.floor(Math.random()*1000),
-    name, device, sheetId, appsScriptUrl,
+    name, device, sheetId, appsScriptUrl, role: 'admin', restrictedAccess: false, accessPaused: false,
     records: [], referenceMap: new Map(), srCounter: 1,
     createdAt: new Date().toLocaleString(),
   };
   listPrepProjects.push(proj);
   if(appsScriptUrl) entriesDefaultScriptUrl = appsScriptUrl;
+  if(registryScriptUrl && registrySheetId && proj.sheetId && proj.appsScriptUrl) lpRegisterProjectInRegistry(proj);
+  if(restricted && registryScriptUrl && registrySheetId && proj.sheetId) lpEnableRestrictedAccess(proj.id);
   closeNewListPrepModal();
   renderListPrepProjectList();
 }
@@ -3002,8 +3168,56 @@ function renderListPrepProjectList(){
   if(listPrepProjects.length===0){ wrap.innerHTML = '<div class="subtext">No lists yet — create one above to get started.</div>'; return; }
   wrap.innerHTML = listPrepProjects.map(p=>{
     const cloudOn = !!(p.appsScriptUrl && p.sheetId);
+    const isField = p.role === 'field';
     const counts = { dispatch:0, scrap:0, irrepairable:0 };
     p.records.forEach(r=>{ if(counts[r.status]!==undefined) counts[r.status]++; });
+    const cloudBlock = isField ? `
+      <div class="pc-cloud">
+        <label class="field-label">Device Name (shown on entries saved from here)</label>
+        <div class="row">
+          <input type="text" id="lpPcDevice-${p.id}" value="${p.device||''}" placeholder="e.g. Inspector-1 Phone">
+          <button class="btn outline small" style="flex:0 0 70px;" onclick="saveLpDeviceName('${p.id}')">Save</button>
+        </div>
+        <div class="subtext" style="margin-top:6px;">Field device — Sheet details and sharing are managed by this list's Admin.</div>
+        <div class="ocr-status" id="lpPcStatus-${p.id}"></div>
+      </div>` : `
+      <div class="pc-cloud">
+        <label class="field-label">Google Sheet ID</label>
+        <input type="text" id="lpPcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID">
+        <label class="field-label">Apps Script Web App URL (same one used everywhere)</label>
+        <input type="text" id="lpPcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
+        <button class="btn amber small" style="margin-top:8px;" onclick="saveListPrepCloudSettings('${p.id}')">Save</button>
+        <div class="row" style="margin-top:8px;">
+          <button class="btn outline small" onclick="openLpShareModal('${p.id}', false)">🔗 Share (Field Work)</button>
+          <button class="btn outline small" onclick="lpManualRegisterProject('${p.id}')">📋 Register in Auto-Restore List</button>
+        </div>
+        <button class="btn outline small" style="margin-top:8px;" onclick="openLpShareModal('${p.id}', true)">👑 Transfer Admin Rights</button>
+
+        ${p.restrictedAccess ? `
+        <label class="field-label" style="margin-top:12px;">🔒 Grant Access to a Device</label>
+        <div class="row">
+          <input type="text" id="lpPcGrantDevice-${p.id}" placeholder="Exact device name to grant">
+          <select id="lpPcGrantHours-${p.id}" style="flex:0 0 90px;" onchange="document.getElementById('lpPcGrantCustomHours-${p.id}').style.display = this.value==='custom' ? 'block' : 'none';">
+            <option value="24">24h</option>
+            <option value="72">72h</option>
+            <option value="168">7 days</option>
+            <option value="custom">Custom…</option>
+          </select>
+        </div>
+        <input type="number" id="lpPcGrantCustomHours-${p.id}" placeholder="Custom hours" style="display:none; margin-top:6px;">
+        <button class="btn amber small" style="margin-top:6px;" onclick="lpGrantAccessToDevice('${p.id}')">Grant Access</button>
+        <div class="subtext" style="margin-top:4px;">
+          Manage existing grants (Allowed / Restricted / Paused) in the <code>Access - ${p.name}</code> tab of your
+          Registry Sheet — same one used for Receiving Inspection.
+        </div>` : `
+        <div class="row" style="margin-top:12px;">
+          <label style="display:flex; align-items:center; gap:6px; font-size:13px; flex:1;">
+            <input type="checkbox" onclick="if(this.checked && !confirm('Turn on Restricted Access for this list? Only devices you explicitly grant will be able to join it.')){ this.checked=false; } else if(this.checked){ lpEnableRestrictedAccess('${p.id}'); }" style="width:auto;">
+            🔒 Turn on Restricted Access for this list
+          </label>
+        </div>`}
+        <div class="ocr-status" id="lpPcStatus-${p.id}"></div>
+      </div>`;
     return `
     <div class="project-card">
       <div class="pc-head">
@@ -3011,19 +3225,16 @@ function renderListPrepProjectList(){
           <div class="pc-name">${p.name}</div>
           <div class="pc-meta">${p.device} · Created ${p.createdAt} · ${p.records.length} meter(s)</div>
           <span class="pc-badge ${cloudOn?'on':'off'}">${cloudOn?'☁ Cloud Sync ON':'☁ Cloud Sync not linked'}</span>
+          <span class="pc-badge ${isField ? 'off' : 'on'}" style="${isField ? 'background:#3a3a3a;' : 'background:#155724;'} color:#fff;">${isField ? '👷 Field' : '👑 Admin'}</span>
+          ${p.restrictedAccess ? '<span class="pc-badge on" style="background:#3d2f6b; color:#fff;">🔒 Restricted Access</span>' : ''}
+          ${p.accessPaused ? '<span class="pc-badge off" style="background:#7a5a10; color:#fff;">⏸ Paused (view only)</span>' : ''}
           <span class="pc-badge on" style="background:#155724; color:#fff;">Dispatch ${counts.dispatch}</span>
           <span class="pc-badge on" style="background:#7a1a1a; color:#fff;">Scrap ${counts.scrap}</span>
           <span class="pc-badge on" style="background:#7a5a10; color:#fff;">Irrepairable ${counts.irrepairable}</span>
         </div>
         <button class="pill-btn" onclick="openListPrepProject('${p.id}')">Open</button>
       </div>
-      <div class="pc-cloud">
-        <label class="field-label">Google Sheet ID</label>
-        <input type="text" id="lpPcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID">
-        <label class="field-label">Apps Script Web App URL (same one used everywhere)</label>
-        <input type="text" id="lpPcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
-        <button class="btn amber small" style="margin-top:8px;" onclick="saveListPrepCloudSettings('${p.id}')">Save</button>
-      </div>
+      ${cloudBlock}
       <div class="pc-actions">
         <button class="btn outline small" style="flex:1;" onclick="exportListPrepExcel('${p.id}')">⬇ Export</button>
         <button class="btn outline small" style="flex:0 0 44px; color:var(--warn); border-color:var(--warn);" onclick="deleteListPrepProject('${p.id}')">🗑</button>
@@ -3031,11 +3242,250 @@ function renderListPrepProjectList(){
     </div>`;
   }).join('');
 }
+function saveLpDeviceName(id){
+  const p = listPrepProjects.find(x=>x.id===id);
+  p.device = document.getElementById('lpPcDevice-'+id).value.trim() || 'This device';
+  renderListPrepProjectList();
+  if(activeListPrepProjectId===id) document.getElementById('lpProjTag').textContent = `${p.name} · ${p.device}${(p.appsScriptUrl && p.sheetId) ? ' · Cloud Sync ON' : ''}`;
+}
+
+/* ---------- Share / Join / Registry parity (mirrors the Receiving versions) ---------- */
+function lpEncodeShareCode(p, isAdminTransfer){
+  try{ return btoa(unescape(encodeURIComponent(JSON.stringify({
+    n:p.name, s:p.sheetId||'', u:p.appsScriptUrl||'', a:isAdminTransfer?1:0,
+    r:p.restrictedAccess?1:0, rs: p.restrictedAccess ? (registrySheetId||'') : '', ru: p.restrictedAccess ? (registryScriptUrl||'') : ''
+  })))); }
+  catch(e){ return ''; }
+}
+function lpDecodeShareCode(code){
+  try{ return JSON.parse(decodeURIComponent(escape(atob(code.trim())))); }
+  catch(e){ return null; }
+}
+let lpShareModalCode = '';
+function openLpShareModal(id, isAdminTransfer){
+  const p = listPrepProjects.find(x=>x.id===id);
+  if(isAdminTransfer && !confirm(`This gives the scanning device FULL Admin control of "${p.name}" — Sheet ID, Script URL, the ability to share it further, and everything else you can do. Continue?`)) return;
+  const code = lpEncodeShareCode(p, isAdminTransfer);
+  if(!code){ alert('Could not generate a Share Code.'); return; }
+  lpShareModalCode = code;
+  document.getElementById('lpShareModalTitle').textContent = isAdminTransfer ? '👑 Transfer Admin Rights' : 'Share List (Field Work)';
+  document.getElementById('lpShareModalSubtext').textContent = isAdminTransfer
+    ? 'Scanning this makes the other device a full Admin of this list — only do this for someone who should have complete control.'
+    : 'Scanning this lets the other device join for field work only — it won\'t see the Sheet ID, Script URL, or be able to share the list further.';
+  document.getElementById('lpShareCodeText').textContent = code;
+  document.getElementById('lpShareModal').classList.add('open');
+  const canvas = document.getElementById('lpShareQrCanvas');
+  const statusEl = document.getElementById('lpShareQrStatus');
+  canvas.style.display = 'none';
+  statusEl.textContent = 'Generating QR code…';
+  if(window.QRCode){
+    QRCode.toCanvas(canvas, code, { width: 260, margin: 1 }, function(err){
+      if(err){ canvas.style.display = 'none'; statusEl.textContent = '⚠ Could not draw the QR code — use the text code below instead.'; }
+      else { canvas.style.display = 'block'; statusEl.textContent = ''; }
+    });
+  } else {
+    statusEl.textContent = '⚠ QR code library did not load — try a hard refresh. Use the text code below instead.';
+  }
+}
+function closeLpShareModal(){ document.getElementById('lpShareModal').classList.remove('open'); }
+function copyLpShareCodeText(){
+  if(!lpShareModalCode) return;
+  navigator.clipboard.writeText(lpShareModalCode).then(()=>{
+    alert('Share Code text copied — send it via WhatsApp/SMS if scanning isn\'t convenient.');
+  }).catch(()=>{ prompt('Copy this Share Code manually:', lpShareModalCode); });
+}
+
+function openLpJoinModal(){ document.getElementById('lpJoinModal').classList.add('open'); }
+function closeLpJoinModal(){
+  document.getElementById('lpJoinModal').classList.remove('open');
+  document.getElementById('lpJoinCodeInput').value=''; document.getElementById('lpJoinDeviceName').value='';
+}
+function lpJoinFromCode(){
+  const code = document.getElementById('lpJoinCodeInput').value.trim();
+  const device = document.getElementById('lpJoinDeviceName').value.trim();
+  if(!code || !device){ alert('Please paste the Share Code and enter your Device Name.'); return; }
+  const decoded = lpDecodeShareCode(code);
+  if(!decoded){ alert('That Share Code could not be read — check it was pasted in full.'); return; }
+  if(decoded.r && decoded.rs && decoded.ru){
+    if(!registryScriptUrl) registryScriptUrl = decoded.ru;
+    if(!registrySheetId) registrySheetId = decoded.rs;
+    const rsidEl = document.getElementById('registrySheetIdInput');
+    const rsurlEl = document.getElementById('registryScriptUrlInput');
+    if(rsidEl && !rsidEl.value) rsidEl.value = registrySheetId;
+    if(rsurlEl && !rsurlEl.value) rsurlEl.value = registryScriptUrl;
+  }
+  const proj = {
+    id: 'lp_' + Date.now() + Math.floor(Math.random()*1000),
+    name: decoded.n || 'Joined List', device, sheetId: decoded.s||'', appsScriptUrl: decoded.u||'',
+    role: decoded.a ? 'admin' : 'field', restrictedAccess: !!decoded.r, accessPaused: false,
+    records: [], referenceMap: new Map(), srCounter: 1,
+    createdAt: new Date().toLocaleString(),
+  };
+  const finishJoin = ()=>{
+    listPrepProjects.push(proj);
+    if(proj.appsScriptUrl) entriesDefaultScriptUrl = proj.appsScriptUrl;
+    if(registryScriptUrl && registrySheetId && proj.sheetId && proj.appsScriptUrl) lpRegisterProjectInRegistry(proj);
+    closeLpJoinModal();
+    renderListPrepProjectList();
+    if(proj.role==='admin') alert(`Joined "${proj.name}" with full Admin rights.`);
+  };
+  if(proj.restrictedAccess){
+    lpCheckAccessForProject(proj).then(res=>{
+      if(!res.allowed){
+        alert(`Could not join "${proj.name}" — ${res.reason || 'access has not been granted to this device.'}\n\nAsk the list owner to grant access to the device name you typed: "${device}" (must match exactly).`);
+        return;
+      }
+      proj.accessPaused = !!res.paused;
+      finishJoin();
+    });
+  } else {
+    finishJoin();
+  }
+}
+
+let lpJoinQrScanner = null;
+function openLpJoinQrScanner(){
+  document.getElementById('lpJoinQrScannerModal').classList.add('open');
+  lpJoinQrScanner = new Html5Qrcode("lp-join-qr-reader", { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], verbose:false });
+  lpJoinQrScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    (decodedText)=>{
+      document.getElementById('lpJoinCodeInput').value = decodedText;
+      closeLpJoinQrScanner();
+      const device = document.getElementById('lpJoinDeviceName').value.trim();
+      if(device){ lpJoinFromCode(); }
+      else { alert('QR code scanned — enter your Device Name, then tap "Join & Pull Records".'); }
+    },
+    ()=>{ }
+  ).catch(err=>{
+    alert('Could not start camera for scanning: ' + err);
+    closeLpJoinQrScanner();
+  });
+}
+function closeLpJoinQrScanner(){
+  document.getElementById('lpJoinQrScannerModal').classList.remove('open');
+  if(lpJoinQrScanner){ lpJoinQrScanner.stop().then(()=>lpJoinQrScanner.clear()).catch(()=>{}); lpJoinQrScanner = null; }
+}
+
+function lpRegisterProjectInRegistry(p){
+  if(!registryScriptUrl || !registrySheetId || !p.sheetId) return;
+  fetch(registryScriptUrl, {
+    method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'registerProject', sheetId:registrySheetId, name:p.name, projectSheetId:p.sheetId,
+      createdAt:p.createdAt, mrvNo:'', activity:'listprep' })
+  }).catch(()=>{});
+}
+function lpManualRegisterProject(id){
+  const p = listPrepProjects.find(x=>x.id===id);
+  const statusEl = document.getElementById('lpPcStatus-'+id);
+  if(!registryScriptUrl || !registrySheetId){
+    if(statusEl) statusEl.textContent = '⚠ No Auto-Restore registry configured yet — set it up from Receiving Inspection → Settings first.';
+    return;
+  }
+  if(!p.sheetId){
+    if(statusEl) statusEl.textContent = '⚠ This list needs its own Sheet ID saved first.';
+    return;
+  }
+  if(statusEl) statusEl.textContent = 'Sending to registry…';
+  fetch(registryScriptUrl, {
+    method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'registerProject', sheetId:registrySheetId, name:p.name, projectSheetId:p.sheetId,
+      createdAt:p.createdAt, mrvNo:'', activity:'listprep' })
+  }).then(()=>{
+    if(statusEl) statusEl.textContent = 'Sent — check the registry Sheet\'s "Projects" tab to confirm.';
+  }).catch(()=>{
+    if(statusEl) statusEl.textContent = '⚠ Could not send — check the Registry Script URL and your connection.';
+  });
+}
+
+/* ---------- Restricted Access parity — same mechanism as Receiving, same Registry Sheet ---------- */
+function lpEnableRestrictedAccess(id){
+  const p = listPrepProjects.find(x=>x.id===id);
+  if(!p || !registryScriptUrl || !registrySheetId || !p.sheetId) return;
+  p.restrictedAccess = true;
+  renderListPrepProjectList();
+  fetch(registryScriptUrl, {
+    method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'setupRestrictedProject', sheetId:registrySheetId, projectSheetId:p.sheetId, projectName:p.name })
+  }).catch(()=>{});
+}
+function lpGrantAccessToDevice(id){
+  const p = listPrepProjects.find(x=>x.id===id);
+  const statusEl = document.getElementById('lpPcStatus-'+id);
+  const deviceName = document.getElementById('lpPcGrantDevice-'+id).value.trim();
+  const hoursSelect = document.getElementById('lpPcGrantHours-'+id).value;
+  const customEl = document.getElementById('lpPcGrantCustomHours-'+id);
+  const hours = hoursSelect==='custom' ? (parseFloat(customEl.value) || 24) : (parseFloat(hoursSelect) || 24);
+  if(!deviceName){ alert('Enter the device name to grant access to.'); return; }
+  if(!registryScriptUrl || !registrySheetId){ if(statusEl) statusEl.textContent = '⚠ Set up the Auto-Restore registry from Receiving Inspection → Settings first.'; return; }
+  if(statusEl) statusEl.textContent = `Granting ${hours}h access to "${deviceName}"…`;
+  fetch(registryScriptUrl, {
+    method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({ action:'grantAccess', sheetId:registrySheetId, projectSheetId:p.sheetId, projectName:p.name, deviceName, durationHours:hours })
+  }).then(()=>{
+    if(statusEl) statusEl.textContent = `✓ Sent — "${deviceName}" can now Join via Code for the next ${hours} hour(s). They must type that exact device name when joining.`;
+    document.getElementById('lpPcGrantDevice-'+id).value = '';
+  }).catch(()=>{
+    if(statusEl) statusEl.textContent = '⚠ Could not send the grant — check your connection and try again.';
+  });
+}
+function lpCheckAccessForProject(p){
+  if(!p.restrictedAccess) return Promise.resolve({allowed:true, paused:false});
+  if(!registryScriptUrl || !registrySheetId || !p.device){
+    return Promise.resolve({allowed:false, paused:false, reason:'Registry or device name not set.'});
+  }
+  return jsonpRequest(registryScriptUrl, {
+    action:'checkAccess', sheetId:registrySheetId, projectSheetId:p.sheetId, projectName:p.name, deviceName:p.device
+  }).then(res=>{
+    if(!res || !res.found) return {allowed:false, paused:false, reason:'This device has not been granted access.'};
+    if(res.status==='Restricted') return {allowed:false, paused:false, reason:'Access has been restricted for this device.'};
+    if(res.expired) return {allowed:false, paused:false, reason:'Access has expired.'};
+    if(res.status==='Paused') return {allowed:true, paused:true, reason:'Access is paused — view only.'};
+    return {allowed:true, paused:false};
+  }).catch(()=>({allowed:true, paused:false, reason:'(could not verify just now — showing last known state)'}));
+}
+function lpRevalidateRestrictedProjects(){
+  const toCheck = listPrepProjects.filter(p=>p.restrictedAccess);
+  if(!toCheck.length) return;
+  Promise.all(toCheck.map(p=>lpCheckAccessForProject(p).then(res=>({p, res})))).then(results=>{
+    let removed = 0;
+    results.forEach(({p, res})=>{
+      if(!res.allowed){
+        listPrepProjects = listPrepProjects.filter(x=>x.id!==p.id);
+        if(activeListPrepProjectId===p.id) activeListPrepProjectId = null;
+        removed++;
+      } else {
+        p.accessPaused = !!res.paused;
+      }
+    });
+    if(removed>0) renderListPrepProjectList();
+    if(activeListPrepProjectId===null) refreshLpEntryVisibility();
+  });
+}
+
 function openListPrepProject(id){
+  const p0 = listPrepProjects.find(x=>x.id===id);
+  if(p0 && p0.restrictedAccess){
+    lpCheckAccessForProject(p0).then(res=>{
+      if(!res.allowed){
+        listPrepProjects = listPrepProjects.filter(x=>x.id!==id);
+        renderListPrepProjectList();
+        alert(`Can't open "${p0.name}" — ${res.reason || 'access is no longer granted to this device.'}`);
+        return;
+      }
+      p0.accessPaused = !!res.paused;
+      doOpenListPrepProject(id);
+    });
+    return;
+  }
+  doOpenListPrepProject(id);
+}
+function doOpenListPrepProject(id){
   activeListPrepProjectId = id;
   const p = getActiveListPrepProject();
-  document.getElementById('lpProjectListView').style.display = 'none';
-  document.getElementById('lpEntryView').style.display = 'block';
+  const pausedTag = p.accessPaused ? ' · ⏸ PAUSED (view only)' : '';
+  document.getElementById('lpProjTag').textContent = `${p.name} · ${p.device}${(p.appsScriptUrl && p.sheetId) ? ' · Cloud Sync ON' : ''}${pausedTag}`;
   document.getElementById('lpProjName').textContent = p.name;
   document.getElementById('lpRefStatus').textContent = p.referenceMap.size
     ? `${p.referenceMap.size} meter numbers loaded for cross-verification.` : 'No reference list loaded — this is a fresh list.';
@@ -3043,13 +3493,16 @@ function openListPrepProject(id){
   resetListPrepForm(true);
   renderLpFilterChips();
   renderLpRecordsTable();
-  window.scrollTo({top:0, behavior:'smooth'});
+  document.getElementById('lpPausedBanner').style.display = p.accessPaused ? 'block' : 'none';
+  const saveBtn = document.getElementById('lpSaveEntryBtn');
+  saveBtn.disabled = !!p.accessPaused;
+  saveBtn.style.opacity = p.accessPaused ? '0.5' : '1';
+  showLpTab('entry');
 }
 function closeListPrepEntryView(){
-  document.getElementById('lpProjectListView').style.display = 'block';
-  document.getElementById('lpEntryView').style.display = 'none';
   activeListPrepProjectId = null;
-  renderListPrepProjectList();
+  document.getElementById('lpProjTag').textContent = 'No list open · SNGPL Faisalabad-D';
+  showLpTab('projects');
 }
 
 /* ---------- Reference list upload (reuses the Apps Script 'dispatcherList' action) ---------- */
@@ -3191,6 +3644,7 @@ function resetListPrepForm(clearMeterNo){
 function saveListPrepEntry(){
   const p = getActiveListPrepProject();
   if(!p){ alert('Open a list first.'); return; }
+  if(p.accessPaused){ alert('This list is currently paused for this device — you can view it, but not save new entries. Ask the list owner to set it back to Allowed.'); return; }
   const meterNo = document.getElementById('lpMeterNo').value.trim();
   if(!meterNo){ alert('Please enter or scan a Meter No.'); return; }
   const existing = p.records.find(r=>r.meterNo.trim().toUpperCase()===meterNo.toUpperCase());
@@ -3294,7 +3748,7 @@ updateReadout();
   const entriesScript = params.get('entriesScript');
   if(regScript && regSheetId){ restoreProjectsFromRegistry(regScript, regSheetId, entriesScript); }
 })();
-showTab('projects');
+goHome();
 </script>
 </body>
 </html>
