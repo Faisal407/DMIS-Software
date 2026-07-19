@@ -28,6 +28,9 @@
   header.topbar .row1>div:first-child{flex:1 1 auto; min-width:0;}
   header.topbar h1{font-size:19px; font-weight:700; line-height:1.15;}
   .home-btn{width:auto !important; flex:0 0 auto; margin-top:0 !important; padding:8px 12px !important; font-size:12.5px !important; white-space:nowrap;}
+  .qr-field-row{display:flex; gap:6px; align-items:center;}
+  .qr-field-row input{flex:1; margin-top:0;}
+  .qr-field-btn{flex:0 0 auto; width:auto !important; margin-top:0 !important; padding:9px 10px !important; font-size:15px !important; line-height:1;}
   header.topbar .tag{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#b9cbd7; margin-top:2px;}
   .pill-btn{background:var(--amber); color:#241407; border:none; border-radius:999px; font-family:'Inter',sans-serif; font-weight:700; font-size:12.5px; padding:9px 14px; white-space:nowrap; cursor:pointer;}
   .pill-btn.secondary{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.45);}
@@ -669,11 +672,23 @@ function output(result, callback) {
     <button class="btn outline" onclick="copyRegistryScriptCode()">📋 Copy Registry Script Code</button>
 
     <label class="field-label" style="margin-top:16px;">Registry Google Sheet ID</label>
-    <input type="text" id="registrySheetIdInput" placeholder="Paste the Sheet ID — copy directly, don't retype">
+    <div class="qr-field-row">
+      <input type="text" id="registrySheetIdInput" placeholder="Paste the Sheet ID — copy directly, don't retype">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('registrySheetIdInput')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('registrySheetIdInput','Registry Sheet ID')" title="Show as QR">⊞</button>
+    </div>
     <label class="field-label">Registry Script Web App URL (the new, separate one)</label>
-    <input type="text" id="registryScriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="qr-field-row">
+      <input type="text" id="registryScriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('registryScriptUrlInput')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('registryScriptUrlInput','Registry Script URL')" title="Show as QR">⊞</button>
+    </div>
     <label class="field-label">Entries Apps Script URL (same one already used on your project cards)</label>
-    <input type="text" id="entriesScriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="qr-field-row">
+      <input type="text" id="entriesScriptUrlInput" placeholder="https://script.google.com/macros/s/…/exec">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('entriesScriptUrlInput')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('entriesScriptUrlInput','Entries Script URL')" title="Show as QR">⊞</button>
+    </div>
     <button class="btn amber" onclick="saveRegistryAndGenerateLink()">Save &amp; Generate My Link</button>
     <div id="registryLinkBox" style="margin-top:10px;"></div>
     <div class="ocr-status" id="registryStatus"></div>
@@ -994,9 +1009,17 @@ function doGet(e) {
     <label class="field-label">MR / MRV No. (Material Requisition / Return Voucher) — optional</label>
     <input type="text" id="npMrvNo" placeholder="e.g. MRV-2026-0417">
     <label class="field-label">Google Sheet ID for this project (optional — link later if unsure)</label>
-    <input type="text" id="npSheetId" placeholder="From this project's own Sheet URL, e.g. 1AbC...xyz">
+    <div class="qr-field-row">
+      <input type="text" id="npSheetId" placeholder="From this project's own Sheet URL, e.g. 1AbC...xyz">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('npSheetId')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('npSheetId','Sheet ID')" title="Show as QR">⊞</button>
+    </div>
     <label class="field-label">Apps Script Web App URL (optional — same URL reused for every project)</label>
-    <input type="text" id="npScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="qr-field-row">
+      <input type="text" id="npScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('npScriptUrl')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('npScriptUrl','Script URL')" title="Show as QR">⊞</button>
+    </div>
     <div class="cond-row" style="margin-top:10px;">
       <span class="cond-label">🔒 Restricted Access</span>
       <label style="display:flex; align-items:center; gap:6px; font-size:13px;">
@@ -1215,9 +1238,17 @@ function doGet(e) {
     <label class="field-label">Device Name</label>
     <input type="text" id="lpNpDevice" placeholder="e.g. Inspector-1 Phone">
     <label class="field-label">Google Sheet ID for this list (optional — link later if unsure)</label>
-    <input type="text" id="lpNpSheetId" placeholder="A Sheet ID — can be its own, or shared with a project">
+    <div class="qr-field-row">
+      <input type="text" id="lpNpSheetId" placeholder="A Sheet ID — can be its own, or shared with a project">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('lpNpSheetId')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('lpNpSheetId','Sheet ID')" title="Show as QR">⊞</button>
+    </div>
     <label class="field-label">Apps Script Web App URL (optional — same URL reused everywhere)</label>
-    <input type="text" id="lpNpScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+    <div class="qr-field-row">
+      <input type="text" id="lpNpScriptUrl" placeholder="https://script.google.com/macros/s/…/exec">
+      <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('lpNpScriptUrl')" title="Scan QR to fill">📷</button>
+      <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('lpNpScriptUrl','Script URL')" title="Show as QR">⊞</button>
+    </div>
     <div class="cond-row" style="margin-top:10px;">
       <span class="cond-label">🔒 Restricted Access</span>
       <label style="display:flex; align-items:center; gap:6px; font-size:13px;">
@@ -1293,6 +1324,29 @@ function doGet(e) {
 </div>
 
 </div> <!-- /#listPrepShell -->
+
+<!-- Shared: scan a QR code into any Sheet ID / Script URL field -->
+<div class="modal-backdrop" id="genericQrScannerModal">
+  <div class="modal-box">
+    <h3>Scan QR Code</h3>
+    <div class="subtext">Scan a QR previously generated with "⊞ Show as QR" for this same field — fills it in exactly, no retyping.</div>
+    <div id="generic-qr-reader"></div>
+    <button class="btn outline" onclick="closeGenericQrScanner()">Cancel</button>
+  </div>
+</div>
+
+<!-- Shared: show a field's current value as a QR code, to scan into another device/field -->
+<div class="modal-backdrop" id="showFieldQrModal">
+  <div class="modal-box">
+    <h3 id="showFieldQrTitle">Show as QR</h3>
+    <div class="subtext">Scan this from another device to fill in the same value there — no retyping, no risk of a mistyped character.</div>
+    <div style="display:flex; justify-content:center; margin:14px 0;">
+      <canvas id="showFieldQrCanvas" style="max-width:100%; border-radius:10px;"></canvas>
+    </div>
+    <div class="ocr-status" id="showFieldQrStatus"></div>
+    <button class="btn outline" onclick="closeShowFieldQr()">Close</button>
+  </div>
+</div>
 
 <script>
 const METER_TYPES = [
@@ -2168,9 +2222,17 @@ function renderProjectList(){
           <button class="btn outline small" style="flex:0 0 70px;" onclick="saveProjectMeta('${p.id}')">Save</button>
         </div>
         <label class="field-label">Google Sheet ID (unique to this project)</label>
-        <input type="text" id="pcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID from its URL">
+        <div class="qr-field-row">
+          <input type="text" id="pcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID from its URL">
+          <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('pcSheetId-${p.id}')" title="Scan QR to fill">📷</button>
+          <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('pcSheetId-${p.id}','Sheet ID')" title="Show as QR">⊞</button>
+        </div>
         <label class="field-label">Apps Script Web App URL (same one for every project)</label>
-        <input type="text" id="pcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="qr-field-row">
+          <input type="text" id="pcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
+          <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('pcScriptUrl-${p.id}')" title="Scan QR to fill">📷</button>
+          <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('pcScriptUrl-${p.id}','Script URL')" title="Show as QR">⊞</button>
+        </div>
         <div class="row" style="margin-top:8px;">
           <button class="btn outline small" onclick="testProjectCloudSync('${p.id}')">Test</button>
           <button class="btn amber small" onclick="saveProjectCloudSettings('${p.id}')">Save</button>
@@ -3185,9 +3247,17 @@ function renderListPrepProjectList(){
       </div>` : `
       <div class="pc-cloud">
         <label class="field-label">Google Sheet ID</label>
-        <input type="text" id="lpPcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID">
+        <div class="qr-field-row">
+          <input type="text" id="lpPcSheetId-${p.id}" value="${p.sheetId||''}" placeholder="Sheet ID">
+          <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('lpPcSheetId-${p.id}')" title="Scan QR to fill">📷</button>
+          <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('lpPcSheetId-${p.id}','Sheet ID')" title="Show as QR">⊞</button>
+        </div>
         <label class="field-label">Apps Script Web App URL (same one used everywhere)</label>
-        <input type="text" id="lpPcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="qr-field-row">
+          <input type="text" id="lpPcScriptUrl-${p.id}" value="${p.appsScriptUrl||''}" placeholder="https://script.google.com/macros/s/…/exec">
+          <button type="button" class="btn outline qr-field-btn" onclick="openGenericQrScanner('lpPcScriptUrl-${p.id}')" title="Scan QR to fill">📷</button>
+          <button type="button" class="btn outline qr-field-btn" onclick="showFieldAsQr('lpPcScriptUrl-${p.id}','Script URL')" title="Show as QR">⊞</button>
+        </div>
         <button class="btn amber small" style="margin-top:8px;" onclick="saveListPrepCloudSettings('${p.id}')">Save</button>
         <div class="row" style="margin-top:8px;">
           <button class="btn outline small" onclick="openLpShareModal('${p.id}', false)">🔗 Share (Field Work)</button>
@@ -3369,6 +3439,57 @@ function closeLpJoinQrScanner(){
   document.getElementById('lpJoinQrScannerModal').classList.remove('open');
   if(lpJoinQrScanner){ lpJoinQrScanner.stop().then(()=>lpJoinQrScanner.clear()).catch(()=>{}); lpJoinQrScanner = null; }
 }
+
+/* ============================================================
+   SHARED: scan-into-field / show-field-as-QR — used everywhere a
+   Sheet ID or Apps Script URL needs entering, so a value only ever
+   has to be typed correctly once, then reused by scanning instead
+   of retyping or copy-pasting (the source of many earlier bugs).
+   ============================================================ */
+let genericQrScanner = null;
+let genericQrTargetField = null;
+function openGenericQrScanner(targetFieldId){
+  genericQrTargetField = targetFieldId;
+  document.getElementById('genericQrScannerModal').classList.add('open');
+  genericQrScanner = new Html5Qrcode("generic-qr-reader", { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], verbose:false });
+  genericQrScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: { width: 260, height: 260 } },
+    (decodedText)=>{
+      const el = document.getElementById(genericQrTargetField);
+      if(el) el.value = decodedText.trim();
+      closeGenericQrScanner();
+    },
+    ()=>{ }
+  ).catch(err=>{
+    alert('Could not start camera for scanning: ' + err);
+    closeGenericQrScanner();
+  });
+}
+function closeGenericQrScanner(){
+  document.getElementById('genericQrScannerModal').classList.remove('open');
+  if(genericQrScanner){ genericQrScanner.stop().then(()=>genericQrScanner.clear()).catch(()=>{}); genericQrScanner = null; }
+}
+function showFieldAsQr(sourceFieldId, label){
+  const el = document.getElementById(sourceFieldId);
+  const value = el ? el.value.trim() : '';
+  if(!value){ alert('Nothing typed in this field yet — enter the value first, then show it as a QR.'); return; }
+  document.getElementById('showFieldQrTitle').textContent = label ? `Show ${label} as QR` : 'Show as QR';
+  document.getElementById('showFieldQrModal').classList.add('open');
+  const canvas = document.getElementById('showFieldQrCanvas');
+  const statusEl = document.getElementById('showFieldQrStatus');
+  canvas.style.display = 'none';
+  statusEl.textContent = 'Generating QR code…';
+  if(window.QRCode){
+    QRCode.toCanvas(canvas, value, { width: 320, margin: 4, errorCorrectionLevel: 'L' }, function(err){
+      if(err){ canvas.style.display = 'none'; statusEl.textContent = '⚠ Could not draw the QR code — value may be too long to encode.'; }
+      else { canvas.style.display = 'block'; statusEl.textContent = ''; }
+    });
+  } else {
+    statusEl.textContent = '⚠ QR code library did not load — try a hard refresh.';
+  }
+}
+function closeShowFieldQr(){ document.getElementById('showFieldQrModal').classList.remove('open'); }
 
 function lpRegisterProjectInRegistry(p){
   if(!registryScriptUrl || !registrySheetId || !p.sheetId) return;
